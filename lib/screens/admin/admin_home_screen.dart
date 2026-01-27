@@ -4,7 +4,7 @@ import 'package:foodapp/l10n/app_localizations.dart';
 import 'package:foodapp/providers/menu_provider.dart';
 import 'package:foodapp/providers/order_provider.dart';
 import 'package:foodapp/screens/admin/widgets/admin_home_recent_activity.dart';
-import 'package:foodapp/screens/widgets/my_drawer.dart';
+import 'package:foodapp/screens/admin/widgets/admin_drawer.dart';
 import 'package:foodapp/screens/widgets/welcome_box.dart';
 import 'package:foodapp/screens/admin/widgets/admin_home_stats.dart';
 import 'package:foodapp/screens/admin/widgets/admin_home_quick_action.dart';
@@ -22,7 +22,7 @@ class AdminHomeScreen extends StatelessWidget {
         title: Text(AppLocalizations.of(context).t('adminDashboard')),
         elevation: 0,
       ),
-      drawer: const MyDrawer(),
+      drawer: const AdminDrawer(),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(SizeConfig.blockWidth * 2),

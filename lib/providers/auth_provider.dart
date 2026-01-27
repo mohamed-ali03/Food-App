@@ -92,6 +92,7 @@ class AuthProvider extends ChangeNotifier {
     bool? buyingPoints,
     String? name,
     String? phoneNumber,
+    String? address,
     String? imageUrl,
     bool? blocked,
   }) async {
@@ -114,6 +115,7 @@ class AuthProvider extends ChangeNotifier {
         buyingPoints: points,
         name: name,
         phoneNumber: phoneNumber,
+        address: address,
         imageUrl: imageUrl,
         blocked: blocked,
       );

@@ -33,6 +33,8 @@ class EditProfileDialogState extends State<EditProfileDialog> {
       _controller = TextEditingController(text: widget.user?.name);
     } else if (widget.field == 'phone') {
       _controller = TextEditingController(text: widget.user?.phoneNumber ?? '');
+    } else if (widget.field == 'address') {
+      _controller = TextEditingController(text: widget.user?.address ?? '');
     } else {
       _controller = TextEditingController();
       _imageUrl = widget.user?.imageUrl;
@@ -102,7 +104,12 @@ class EditProfileDialogState extends State<EditProfileDialog> {
     } else if (widget.field == 'phone') {
       await context.read<AuthProvider>().updateProfile(
         widget.user?.authID ?? '',
-        phoneNumber: _controller.text.isEmpty ? null : _controller.text,
+        phoneNumber: _controller.text.isEmpty ? '' : _controller.text,
+      );
+    } else if (widget.field == 'address') {
+      await context.read<AuthProvider>().updateProfile(
+        widget.user?.authID ?? '',
+        address: _controller.text.isEmpty ? '' : _controller.text,
       );
     }
 
@@ -123,16 +130,19 @@ class EditProfileDialogState extends State<EditProfileDialog> {
   Widget build(BuildContext context) {
     if (widget.field == 'image') {
       return AlertDialog(
-        title: Text(AppLocalizations.of(context).t('updateProfilePicture')),
+        title: Text(
+          AppLocalizations.of(context).t('updateProfilePicture'),
+          style: TextStyle(fontSize: SizeConfig.blockWidth * 5),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: SizeConfig.blockWidth * 25,
+                width: SizeConfig.blockWidth * 50,
                 height: _imageUrl != null && _imageUrl!.isNotEmpty
                     ? null
-                    : SizeConfig.blockWidth * 25,
+                    : SizeConfig.blockWidth * 50,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey[300]!),
                   borderRadius: BorderRadius.circular(
@@ -204,9 +214,17 @@ class EditProfileDialogState extends State<EditProfileDialog> {
             onPressed: () => Navigator.pop(context),
             child: Text(AppLocalizations.of(context).t('cancel')),
           ),
-          ElevatedButton(
-            onPressed: _isUploadingImage ? null : _save,
-            child: Text(AppLocalizations.of(context).t('save')),
+          Selector<AuthProvider, bool>(
+            builder: (context, value, child) {
+              if (value == true) {
+                return const CircularProgressIndicator();
+              }
+              return ElevatedButton(
+                onPressed: _isUploadingImage ? null : _save,
+                child: Text(AppLocalizations.of(context).t('save')),
+              );
+            },
+            selector: (context, provider) => provider.isLoading,
           ),
         ],
       );
@@ -214,19 +232,16 @@ class EditProfileDialogState extends State<EditProfileDialog> {
 
     return AlertDialog(
       title: Text(
-        '${AppLocalizations.of(context).t('edit')} ${widget.field == 'name' ? AppLocalizations.of(context).t('name') : AppLocalizations.of(context).t('phoneNumber')}',
+        '${AppLocalizations.of(context).t('edit')} ${AppLocalizations.of(context).t(widget.field)}',
       ),
       content: Form(
         key: _formKey,
         child: TextFormField(
           controller: _controller,
+          keyboardType: widget.field == 'phone' ? TextInputType.phone : null,
           decoration: InputDecoration(
-            labelText: widget.field == 'name'
-                ? AppLocalizations.of(context).t('fullName')
-                : AppLocalizations.of(context).t('phoneNumber'),
-            hintText: widget.field == 'name'
-                ? AppLocalizations.of(context).t('enterYourName')
-                : AppLocalizations.of(context).t('enterPhoneNumber'),
+            labelText: AppLocalizations.of(context).t(widget.field),
+            hintText: AppLocalizations.of(context).t(widget.field),
             border: const OutlineInputBorder(),
           ),
           validator: (value) {
@@ -242,9 +257,17 @@ class EditProfileDialogState extends State<EditProfileDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text(AppLocalizations.of(context).t('cancel')),
         ),
-        ElevatedButton(
-          onPressed: _save,
-          child: Text(AppLocalizations.of(context).t('save')),
+        Selector<AuthProvider, bool>(
+          builder: (context, value, child) {
+            if (value == true) {
+              return const CircularProgressIndicator();
+            }
+            return ElevatedButton(
+              onPressed: _isUploadingImage ? null : _save,
+              child: Text(AppLocalizations.of(context).t('save')),
+            );
+          },
+          selector: (context, provider) => provider.isLoading,
         ),
       ],
     );

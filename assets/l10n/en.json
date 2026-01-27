@@ -46,6 +46,8 @@
   "phoneOptional": "Phone (optional)",
   "phoneRequired": "Phone is required",
   "phoneMinLength" : "Phone must be at least 11 characters",
+  "address": "Address",
+  "addressRequired": "Address is required",
   
   "home": "Home",
   "cart": "Cart",

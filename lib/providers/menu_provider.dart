@@ -25,12 +25,12 @@ class MenuProvider extends ChangeNotifier {
 
     _itemsSub = _repo.watchLocalMenu().listen((items) {
       this.items = items;
-      notifyListeners();
+      _setLoading(false);
     });
 
     _categoriesSub = _repo.watchCategories().listen((cats) {
       categories = cats;
-      notifyListeners();
+      _setLoading(false);
     });
   }
 
@@ -40,7 +40,6 @@ class MenuProvider extends ChangeNotifier {
       _setError(null);
       _setLoading(true);
       await _repo.clearAllMenuData();
-      _setLoading(false);
     } catch (e) {
       _setError('Failed to clear menu data: $e');
       debugPrint('Error clearing menu data: $e');
@@ -56,8 +55,6 @@ class MenuProvider extends ChangeNotifier {
 
       await _repo.syncCat();
       await _repo.syncMenu();
-
-      _setLoading(false);
     } catch (e) {
       _setError('Failed to sync menu: $e');
       debugPrint('Error syncing: $e');
@@ -80,8 +77,6 @@ class MenuProvider extends ChangeNotifier {
       _setError(null);
 
       await _repo.addItem(item);
-
-      _setLoading(false);
     } catch (e) {
       _setError('Failed to add item: $e');
       debugPrint('Error adding item: $e');
@@ -96,8 +91,6 @@ class MenuProvider extends ChangeNotifier {
       _setError(null);
 
       await _repo.updateItem(item);
-
-      _setLoading(false);
     } catch (e) {
       _setError('Failed to update item: $e');
       debugPrint('Error updating item: $e');
@@ -112,8 +105,6 @@ class MenuProvider extends ChangeNotifier {
       _setError(null);
 
       await _repo.deleteItem(item);
-
-      _setLoading(false);
     } catch (e) {
       _setError('Failed to delete item: $e');
       debugPrint('Error deleting item: $e');
@@ -128,8 +119,6 @@ class MenuProvider extends ChangeNotifier {
       _setError(null);
 
       await _repo.addCat(category);
-
-      _setLoading(false);
     } catch (e) {
       _setError('Failed to add category: $e');
       debugPrint('Error adding category: $e');
@@ -144,8 +133,6 @@ class MenuProvider extends ChangeNotifier {
       _setError(null);
 
       await _repo.updateCat(category!);
-
-      _setLoading(false);
     } catch (e) {
       _setError('Failed to update category: $e');
       debugPrint('Error updating category: $e');
@@ -160,8 +147,6 @@ class MenuProvider extends ChangeNotifier {
       _setError(null);
 
       await _repo.deleteCat(category);
-
-      _setLoading(false);
     } catch (e) {
       _setError('Failed to delete category: $e');
       debugPrint('Error deleting category: $e');

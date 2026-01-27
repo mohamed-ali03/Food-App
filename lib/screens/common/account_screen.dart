@@ -20,21 +20,16 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  UserModel? user;
   String lang = 'En';
 
   @override
   void initState() {
-    user = context.read<AuthProvider>().user;
     lang = context.read<AppSettingsProvider>().lang == 'ar' ? 'En' : 'Ar';
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (user == null) {
-      return _EmptyState();
-    }
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -61,103 +56,125 @@ class _AccountScreenState extends State<AccountScreen> {
       ),
       body: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          children: [
-            // Profile Header Section
-            AccountProfileHeader(
-              user: user,
-              onEditImage: () =>
-                  _showEditProfileDialog(context, field: 'image'),
-            ),
-            SizedBox(height: SizeConfig.blockHight * 3),
+        child: Consumer<AuthProvider>(
+          builder: (context, provider, child) {
+            final user = provider.user;
+            if (user == null) {
+              return _EmptyState();
+            }
 
-            // Information Cards
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: SizeConfig.blockHight * 2,
-              ),
-              child: Column(
-                children: [
-                  AccountInfoCard(
-                    icon: Icons.person,
-                    label: AppLocalizations.of(context).t('fullName'),
-                    value:
-                        user?.name ?? AppLocalizations.of(context).t('unknown'),
-                    onEdit: () =>
-                        _showEditProfileDialog(context, field: 'name'),
+            return Column(
+              children: [
+                // Profile Header Section
+                AccountProfileHeader(
+                  user: user,
+                  onEditImage: () =>
+                      _showEditProfileDialog(context, user, field: 'image'),
+                ),
+                SizedBox(height: SizeConfig.blockHight * 3),
+
+                // Information Cards
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: SizeConfig.blockHight * 2,
                   ),
-                  SizedBox(height: SizeConfig.blockHight * 1.5),
-                  AccountInfoCard(
-                    icon: Icons.phone,
-                    label: AppLocalizations.of(context).t('phoneNumber'),
-                    value:
-                        user?.phoneNumber ??
-                        AppLocalizations.of(context).t('notProvided'),
-                    onEdit: () =>
-                        _showEditProfileDialog(context, field: 'phone'),
-                  ),
-                  SizedBox(height: SizeConfig.blockHight * 1.5),
-                  AccountInfoCard(
-                    icon: Icons.badge,
-                    label: AppLocalizations.of(context).t('role'),
-                    value:
-                        user?.role.toUpperCase() ??
-                        AppLocalizations.of(context).t('user'),
-                    showEdit: false,
-                    valueWidget: _RoleBadge(role: user?.role ?? 'unknown'),
-                  ),
-                  SizedBox(height: SizeConfig.blockHight * 1.5),
-                  AccountInfoCard(
-                    icon: Icons.block,
-                    label: AppLocalizations.of(context).t('status'),
-                    value: user!.blocked
-                        ? AppLocalizations.of(context).t('blocked')
-                        : AppLocalizations.of(context).t('active'),
-                    showEdit: false,
-                  ),
-                  if (user?.role == 'user')
-                    Column(
-                      children: [
-                        SizedBox(height: SizeConfig.blockHight * 1.5),
-                        AccountInfoCard(
-                          icon: Icons.badge,
-                          label: AppLocalizations.of(context).t('points'),
-                          value: user?.buyingPoints.toString() ?? '0',
-                          showEdit: false,
+                  child: Column(
+                    children: [
+                      AccountInfoCard(
+                        icon: Icons.person,
+                        label: AppLocalizations.of(context).t('fullName'),
+                        value: user.name != ''
+                            ? user.name
+                            : AppLocalizations.of(context).t('Unknown'),
+                        onEdit: () => _showEditProfileDialog(
+                          context,
+                          user,
+                          field: 'name',
                         ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(height: SizeConfig.blockHight * 1.5),
+                      AccountInfoCard(
+                        icon: Icons.phone,
+                        label: AppLocalizations.of(context).t('phoneNumber'),
+                        value: user.phoneNumber != ''
+                            ? user.phoneNumber ?? ''
+                            : AppLocalizations.of(context).t('notProvided'),
+                        onEdit: () => _showEditProfileDialog(
+                          context,
+                          user,
+                          field: 'phone',
+                        ),
+                      ),
+                      SizedBox(height: SizeConfig.blockHight * 1.5),
+                      AccountInfoCard(
+                        icon: Icons.phone,
+                        label: AppLocalizations.of(context).t('address'),
+                        value: user.address != ''
+                            ? user.address ?? ''
+                            : AppLocalizations.of(context).t('notProvided'),
+                        onEdit: () => _showEditProfileDialog(
+                          context,
+                          user,
+                          field: 'address',
+                        ),
+                      ),
+                      SizedBox(height: SizeConfig.blockHight * 1.5),
+                      AccountInfoCard(
+                        icon: Icons.badge,
+                        label: AppLocalizations.of(context).t('role'),
+                        value: user.role.toUpperCase() == 'USER'
+                            ? AppLocalizations.of(context).t('User')
+                            : user.role.toUpperCase(),
+                        showEdit: false,
+                        valueWidget: _RoleBadge(role: user.role),
+                      ),
+                      SizedBox(height: SizeConfig.blockHight * 1.5),
+                      AccountInfoCard(
+                        icon: Icons.block,
+                        label: AppLocalizations.of(context).t('status'),
+                        value: user.blocked
+                            ? AppLocalizations.of(context).t('blocked')
+                            : AppLocalizations.of(context).t('active'),
+                        showEdit: false,
+                      ),
+                      if (user.role == 'user')
+                        Column(
+                          children: [
+                            SizedBox(height: SizeConfig.blockHight * 1.5),
+                            AccountInfoCard(
+                              icon: Icons.badge,
+                              label: AppLocalizations.of(context).t('points'),
+                              value: user.buyingPoints.toString(),
+                              showEdit: false,
+                            ),
+                          ],
+                        ),
 
-                  SizedBox(height: SizeConfig.blockHight * 1.5),
-                  AccountInfoCard(
-                    icon: Icons.calendar_today,
-                    label: AppLocalizations.of(context).t('memberSince'),
-                    value: _formatDate(user?.createdAt),
-                    showEdit: false,
+                      SizedBox(height: SizeConfig.blockHight * 1.5),
+                      AccountInfoCard(
+                        icon: Icons.calendar_today,
+                        label: AppLocalizations.of(context).t('memberSince'),
+                        value: _formatDate(user.createdAt),
+                        showEdit: false,
+                      ),
+                    ],
                   ),
-                  SizedBox(height: SizeConfig.blockHight * 1.5),
-                  AccountInfoCard(
-                    icon: Icons.fingerprint,
-                    label: AppLocalizations.of(context).t('userID'),
-                    value: '${user?.authID.substring(0, 20)}...',
-                    showEdit: false,
+                ),
+
+                SizedBox(height: SizeConfig.blockHight * 4),
+
+                // Logout Button
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: SizeConfig.blockHight * 2,
                   ),
-                ],
-              ),
-            ),
+                  child: LogoutButton(),
+                ),
 
-            SizedBox(height: SizeConfig.blockHight * 4),
-
-            // Logout Button
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: SizeConfig.blockHight * 2,
-              ),
-              child: LogoutButton(),
-            ),
-
-            SizedBox(height: SizeConfig.blockHight * 4),
-          ],
+                SizedBox(height: SizeConfig.blockHight * 4),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -183,17 +200,14 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   void _showEditProfileDialog(
-    BuildContext context, {
+    BuildContext context,
+    UserModel user, {
     required String field,
-  }) async {
-    await showDialog(
+  }) {
+    showDialog(
       context: context,
       builder: (context) => EditProfileDialog(user: user, field: field),
     );
-
-    setState(() {
-      user = context.read<AuthProvider>().user;
-    });
   }
 }
 

@@ -8,8 +8,8 @@ import 'package:provider/provider.dart';
 
 // responsive : done
 
-class MyDrawer extends StatelessWidget {
-  const MyDrawer({super.key});
+class AdminDrawer extends StatelessWidget {
+  const AdminDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {

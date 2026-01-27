@@ -45,6 +45,8 @@
   "phoneOptional": "رقم التليفون (اختياري)",
   "phoneRequired": "رقم التليفون مطلوب",
   "phoneMinLength": "رقم التليفون لازم يكون 11 رقم على الأقل",
+  "address": "العنوان",
+  "addressRequired": "العنوان مطلوب",
   
   "home": "الرئيسية",
   "cart": "السلة",

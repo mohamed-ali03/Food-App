@@ -115,6 +115,9 @@ class _UnsyncedItemsState extends State<UnsyncedItems> {
     }
 
     // Show dialog that returns the entered address (or null if cancelled).
+    if (authProvider.user?.address != null) {
+      addressController.text = authProvider.user!.address!;
+    }
 
     final address = await showDialog<String?>(
       context: context,
