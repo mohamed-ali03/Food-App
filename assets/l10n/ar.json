@@ -175,6 +175,8 @@
   "orderStatusUpdated": "حالة الطلب بقت {status}",
   "orderStatusUpdatedTo": "حالة الطلب اتحدثت لـ {status}",
   "markAs": "تحديد كـ {status}",
+  "itemUpdatedSuccessfully": "الصنف اتحدثت بنجاح",
+  "failedToUpdateItem": "فشل تحديث الصنف",
   
   "deliveryAddress": "عنوان التوصيل",
   "deliveryAddressLabel": "عنوان التوصيل",

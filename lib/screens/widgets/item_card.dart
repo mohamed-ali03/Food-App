@@ -4,6 +4,7 @@ import 'package:foodapp/core/size_config.dart';
 import 'package:foodapp/l10n/app_localizations.dart';
 import 'package:foodapp/models/item%20model/item_model.dart';
 import 'package:foodapp/providers/auth_provider.dart';
+import 'package:foodapp/providers/menu_provider.dart';
 import 'package:foodapp/providers/order_provider.dart';
 import 'package:foodapp/screens/widgets/availability_badge.dart';
 import 'package:foodapp/screens/widgets/item_details_sheet.dart';
@@ -116,7 +117,49 @@ class _ItemCardState extends State<ItemCard> {
                               ],
                             ),
                             SizedBox(width: SizeConfig.blockWidth),
-                            AvailabilityBadge(available: widget.item.available),
+                            GestureDetector(
+                              onTap: role != 'user'
+                                  ? () async {
+                                      final menuProvider = context
+                                          .read<MenuProvider>();
+                                      widget.item.available =
+                                          !widget.item.available;
+                                      await menuProvider.updateItem(
+                                        widget.item,
+                                      );
+                                      if (context.mounted) {
+                                        if (menuProvider.error != null) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                AppLocalizations.of(
+                                                  context,
+                                                ).t('failedToUpdateItem'),
+                                              ),
+                                            ),
+                                          );
+                                        } else {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                AppLocalizations.of(
+                                                  context,
+                                                ).t('itemUpdatedSuccessfully'),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    }
+                                  : null,
+                              child: AvailabilityBadge(
+                                available: widget.item.available,
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -125,67 +168,83 @@ class _ItemCardState extends State<ItemCard> {
                 ],
               ),
             ),
-            const Divider(height: 1),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: SizeConfig.blockHight),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: role == 'user'
-                    ? [
-                        Text(
-                          '${AppLocalizations.of(context).t('price')}: ${AppLocalizations.of(context).t("currency", data: {'amount': widget.item.price.toStringAsFixed(2)})}',
-                          style: TextStyle(fontSize: SizeConfig.blockHight * 2),
-                        ),
-                        widget.item.available
-                            ? Selector<OrderProvider, bool>(
-                                selector: (_, provider) =>
-                                    provider.orderItems.any(
-                                      (o) =>
-                                          o.itemId == widget.item.itemId &&
-                                          o.synced == false,
-                                    ),
-                                builder: (context, isSelected, child) {
-                                  if (!widget.item.available) {
-                                    return const Icon(
-                                      Icons.block,
-                                      color: Colors.red,
-                                    );
-                                  }
-
-                                  return IconButton(
-                                    icon: Icon(
-                                      isSelected
-                                          ? Icons.check_circle
-                                          : Icons.add_shopping_cart,
-                                      color: isSelected ? Colors.green : null,
-                                    ),
-                                    onPressed: () {
-                                      widget.onSelectItem?.call(!isSelected);
-                                    },
-                                  );
-                                },
-                              )
-                            : IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.block,
-                                  color: Colors.red,
+            if (role != 'staff')
+              Column(
+                children: [
+                  const Divider(height: 1),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: SizeConfig.blockHight,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: role == 'user'
+                          ? [
+                              Text(
+                                '${AppLocalizations.of(context).t('price')}: ${AppLocalizations.of(context).t("currency", data: {'amount': widget.item.price.toStringAsFixed(2)})}',
+                                style: TextStyle(
+                                  fontSize: SizeConfig.blockHight * 2,
                                 ),
                               ),
-                      ]
-                    : [
-                        if (widget.onEdit != null)
-                          TextButton.icon(
-                            onPressed: widget.onEdit,
-                            icon: Icon(
-                              Icons.edit,
-                              size: SizeConfig.blockHight * 3,
-                            ),
-                            label: Text(AppLocalizations.of(context).t('edit')),
-                          ),
-                      ],
+                              widget.item.available
+                                  ? Selector<OrderProvider, bool>(
+                                      selector: (_, provider) =>
+                                          provider.orderItems.any(
+                                            (o) =>
+                                                o.itemId ==
+                                                    widget.item.itemId &&
+                                                o.synced == false,
+                                          ),
+                                      builder: (context, isSelected, child) {
+                                        if (!widget.item.available) {
+                                          return const Icon(
+                                            Icons.block,
+                                            color: Colors.red,
+                                          );
+                                        }
+
+                                        return IconButton(
+                                          icon: Icon(
+                                            isSelected
+                                                ? Icons.check_circle
+                                                : Icons.add_shopping_cart,
+                                            color: isSelected
+                                                ? Colors.green
+                                                : null,
+                                          ),
+                                          onPressed: () {
+                                            widget.onSelectItem?.call(
+                                              !isSelected,
+                                            );
+                                          },
+                                        );
+                                      },
+                                    )
+                                  : IconButton(
+                                      onPressed: () {},
+                                      icon: const Icon(
+                                        Icons.block,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                            ]
+                          : [
+                              if (widget.onEdit != null)
+                                TextButton.icon(
+                                  onPressed: widget.onEdit,
+                                  icon: Icon(
+                                    Icons.edit,
+                                    size: SizeConfig.blockHight * 3,
+                                  ),
+                                  label: Text(
+                                    AppLocalizations.of(context).t('edit'),
+                                  ),
+                                ),
+                            ],
+                    ),
+                  ),
+                ],
               ),
-            ),
           ],
         ),
       ),

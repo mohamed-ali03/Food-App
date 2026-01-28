@@ -7,7 +7,7 @@ import 'package:foodapp/providers/auth_provider.dart';
 import 'package:foodapp/providers/menu_provider.dart';
 import 'package:foodapp/providers/order_provider.dart';
 import 'package:foodapp/screens/admin/admin_home_screen.dart';
-import 'package:foodapp/screens/admin/admin_menu_screen.dart';
+import 'package:foodapp/screens/common/widgets/admin_staff_menu_screen.dart';
 import 'package:foodapp/screens/admin/admin_order_screen.dart';
 import 'package:foodapp/screens/admin/admin_settings_screen.dart';
 import 'package:foodapp/screens/admin/admin_statistics_screen.dart';
@@ -68,7 +68,7 @@ class MyApp extends StatelessWidget {
             '/userHomeScreen': (context) => const UserHomeScreen(),
             '/userCartScreen': (context) => const UserCartScreen(),
             '/accountScreen': (context) => const AccountScreen(),
-            '/adminMenuScreen': (context) => const AdminMenuScreen(),
+            '/adminMenuScreen': (context) => const AdminStaffMenuScreen(),
             '/adminOrdersScreen': (context) => const AdminOrderScreen(),
             '/adminUsersScreen': (context) => const AdminUsersScreen(),
             '/adminSettingsScreen': (context) => const AdminSettingsScreen(),

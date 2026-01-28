@@ -36,7 +36,7 @@ class OrderProvider extends ChangeNotifier {
     try {
       _setError(null);
       // sync orders
-      await _repo.fetchAllOrders();
+      // await _repo.fetchAllOrders();
 
       // Start realtime AFTER init
       _repo.listenToOrderChanges(role ?? 'user');

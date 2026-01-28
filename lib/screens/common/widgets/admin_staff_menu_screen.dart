@@ -3,6 +3,7 @@ import 'package:foodapp/core/size_config.dart';
 import 'package:foodapp/l10n/app_localizations.dart';
 import 'package:foodapp/models/category%20model/category_model.dart';
 import 'package:foodapp/models/item%20model/item_model.dart';
+import 'package:foodapp/providers/auth_provider.dart';
 import 'package:foodapp/providers/menu_provider.dart';
 import 'package:foodapp/screens/admin/widgets/admin_menu_item_dialog.dart';
 import 'package:foodapp/screens/widgets/item_card.dart';
@@ -13,14 +14,14 @@ import 'package:provider/provider.dart';
 
 // responsive : done
 
-class AdminMenuScreen extends StatefulWidget {
-  const AdminMenuScreen({super.key});
+class AdminStaffMenuScreen extends StatefulWidget {
+  const AdminStaffMenuScreen({super.key});
 
   @override
-  State<AdminMenuScreen> createState() => _AdminMenuScreenState();
+  State<AdminStaffMenuScreen> createState() => _AdminStaffMenuScreenState();
 }
 
-class _AdminMenuScreenState extends State<AdminMenuScreen> {
+class _AdminStaffMenuScreenState extends State<AdminStaffMenuScreen> {
   final TextEditingController _searchController = TextEditingController();
   ValueNotifier<List<ItemModel>> filteredItems = ValueNotifier([]);
   ValueNotifier<Map<String, int>> stats = ValueNotifier({});
@@ -28,6 +29,14 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
   String _searchQuery = '';
   int? _selectedCategoryId;
   bool _showAvailableOnly = false;
+
+  late bool isAdmin;
+
+  @override
+  void initState() {
+    isAdmin = context.read<AuthProvider>().user?.role == 'admin';
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -206,11 +215,13 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
         title: Text(AppLocalizations.of(context).t('menuManagement')),
         elevation: 0,
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddItemDialog(context),
-        icon: const Icon(Icons.add),
-        label: Text(AppLocalizations.of(context).t('addItem')),
-      ),
+      floatingActionButton: isAdmin
+          ? FloatingActionButton.extended(
+              onPressed: () => _showAddItemDialog(context),
+              icon: const Icon(Icons.add),
+              label: Text(AppLocalizations.of(context).t('addItem')),
+            )
+          : null,
       body: Padding(
         padding: EdgeInsets.all(SizeConfig.blockHight * 2),
         child: Consumer<MenuProvider>(
@@ -255,9 +266,15 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                         selectedCategoryId: _selectedCategoryId,
                         showAvailableOnly: _showAvailableOnly,
                         categories: menuProvider.categories,
-                        addCategory: () => _showAddCategoryDialog(context),
-                        editCategory: (value) =>
-                            _showAddCategoryDialog(context, categoryId: value),
+                        addCategory: isAdmin
+                            ? () => _showAddCategoryDialog(context)
+                            : null,
+                        editCategory: isAdmin
+                            ? (value) => _showAddCategoryDialog(
+                                context,
+                                categoryId: value,
+                              )
+                            : null,
                         onSearchChanged: (value) {
                           _searchQuery = value;
                           filteredItems.value = _getFilteredItems(
@@ -326,7 +343,9 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                           return ItemCard(
                             item: item,
                             categoryName: category.name,
-                            onEdit: () => _showEditItemDialog(context, item),
+                            onEdit: isAdmin
+                                ? () => _showEditItemDialog(context, item)
+                                : null,
                           );
                         }, childCount: value.length),
                       );

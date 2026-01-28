@@ -46,6 +46,7 @@ class OrderDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.read<AuthProvider>();
     return DraggableScrollableSheet(
       initialChildSize: 0.9,
       minChildSize: 0.5,
@@ -112,12 +113,10 @@ class OrderDetailsSheet extends StatelessWidget {
                         label: AppLocalizations.of(context).t('orderId'),
                         value: '#${order.orderId}',
                       ),
-                      if (context.read<AuthProvider>().user?.role != 'user')
+                      if (authProvider.user?.role != 'user')
                         InkWell(
                           onTap: () {
-                            final user = context
-                                .read<AuthProvider>()
-                                .users
+                            final user = authProvider.users
                                 .where((u) => u.authID == order.userId)
                                 .firstOrNull;
 
@@ -136,9 +135,7 @@ class OrderDetailsSheet extends StatelessWidget {
                               context,
                             ).t('customerName'),
                             value:
-                                context
-                                    .read<AuthProvider>()
-                                    .users
+                                authProvider.users
                                     .where(
                                       (user) => user.authID == order.userId,
                                     )

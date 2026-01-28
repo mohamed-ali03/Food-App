@@ -96,8 +96,9 @@ class _AccountScreenState extends State<AccountScreen> {
                       AccountInfoCard(
                         icon: Icons.phone,
                         label: AppLocalizations.of(context).t('phoneNumber'),
-                        value: user.phoneNumber != ''
-                            ? user.phoneNumber ?? ''
+                        value:
+                            user.phoneNumber != '' && user.phoneNumber != null
+                            ? user.phoneNumber!
                             : AppLocalizations.of(context).t('notProvided'),
                         onEdit: () => _showEditProfileDialog(
                           context,
@@ -109,8 +110,8 @@ class _AccountScreenState extends State<AccountScreen> {
                       AccountInfoCard(
                         icon: Icons.phone,
                         label: AppLocalizations.of(context).t('address'),
-                        value: user.address != ''
-                            ? user.address ?? ''
+                        value: user.address != '' && user.address != null
+                            ? user.address!
                             : AppLocalizations.of(context).t('notProvided'),
                         onEdit: () => _showEditProfileDialog(
                           context,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:foodapp/core/size_config.dart';
 import 'package:foodapp/l10n/app_localizations.dart';
 import 'package:foodapp/models/order%20model/order_model.dart';
+import 'package:foodapp/providers/auth_provider.dart';
 import 'package:foodapp/providers/order_provider.dart';
 import 'package:foodapp/screens/admin/widgets/admin_order_states.dart';
 import 'package:foodapp/screens/admin/widgets/admin_orders_stats.dart';
@@ -59,6 +60,31 @@ class _AdminOrderScreenState extends State<AdminOrderScreen>
       appBar: AppBar(
         title: Text(AppLocalizations.of(context).t('orderManagement')),
         elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final orderProv = context.read<OrderProvider>();
+              final authProv = context.read<AuthProvider>();
+              await orderProv.fetchAllOrders();
+              if (context.mounted) {
+                if (orderProv.error != null) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(orderProv.error!)));
+                }
+              }
+              await authProv.fetchAllUsers();
+              if (context.mounted) {
+                if (authProv.error != null) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(authProv.error!)));
+                }
+              }
+            },
+            icon: Icon(Icons.sync),
+          ),
+        ],
         bottom: TabBar(
           controller: tabController,
           indicatorColor: Colors.white,

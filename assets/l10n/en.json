@@ -178,6 +178,8 @@
   "orderStatusUpdated": "Order status updated to {status}",
   "orderStatusUpdatedTo": "Order status updated to {status}",
   "markAs": "Mark as {status}",
+  "itemUpdatedSuccessfully": "Item updated successfully",
+  "failedToUpdateItem": "Failed to update item",
   
   "deliveryAddress": "Delivery address",
   "deliveryAddressLabel": "Delivery Address",

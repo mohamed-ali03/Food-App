@@ -30,7 +30,8 @@ class StaffHomeScreen extends StatelessWidget {
                 .where(
                   (o) =>
                       o.status.toLowerCase() != 'pending' &&
-                      o.status.toLowerCase() != 'delivered',
+                      o.status.toLowerCase() != 'delivered' &&
+                      o.status.toLowerCase() != 'canceled',
                 )
                 .length;
 

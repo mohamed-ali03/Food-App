@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodapp/l10n/app_localizations.dart';
+import 'package:foodapp/providers/auth_provider.dart';
 import 'package:foodapp/providers/order_provider.dart';
 import 'package:foodapp/screens/admin/widgets/admin_orders_views.dart';
 import 'package:provider/provider.dart';
@@ -11,10 +12,37 @@ class StaffOrdersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context).t('orders'))),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context).t('orders')),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final orderProv = context.read<OrderProvider>();
+              final authProv = context.read<AuthProvider>();
+              await orderProv.fetchAllOrders();
+              if (context.mounted) {
+                if (orderProv.error != null) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(orderProv.error!)));
+                }
+              }
+              await authProv.fetchAllUsers();
+              if (context.mounted) {
+                if (authProv.error != null) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(authProv.error!)));
+                }
+              }
+            },
+            icon: Icon(Icons.sync),
+          ),
+        ],
+      ),
       body: Consumer<OrderProvider>(
         builder: (context, orderProv, _) {
-          if (orderProv.isLoading && orderProv.orders.isEmpty) {
+          if (orderProv.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
