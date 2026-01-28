@@ -30,6 +30,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final messager = ScaffoldMessenger.of(context);
+    final appLocal = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: Consumer<AuthProvider>(
@@ -178,11 +180,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     phoneNumber: phoneController.text.trim(),
                                   );
 
-                                  if (authProvider.error != null &&
-                                      context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
+                                  if (authProvider.error != null) {
+                                    messager.showSnackBar(
                                       SnackBar(
-                                        content: Text(authProvider.error!),
+                                        content: Text(
+                                          appLocal.t(
+                                            "error",
+                                            data: {
+                                              "error": authProvider.error!,
+                                            },
+                                          ),
+                                        ),
                                       ),
                                     );
                                   }

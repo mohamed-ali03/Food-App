@@ -19,21 +19,20 @@ class StaffOrdersScreen extends StatelessWidget {
             onPressed: () async {
               final orderProv = context.read<OrderProvider>();
               final authProv = context.read<AuthProvider>();
+              final messager = ScaffoldMessenger.of(context);
+              final applocal = AppLocalizations.of(context);
+
               await orderProv.fetchAllOrders();
-              if (context.mounted) {
-                if (orderProv.error != null) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(orderProv.error!)));
-                }
+              if (orderProv.error != null) {
+                messager.showSnackBar(
+                  SnackBar(content: Text(applocal.t(orderProv.error!))),
+                );
               }
               await authProv.fetchAllUsers();
-              if (context.mounted) {
-                if (authProv.error != null) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(authProv.error!)));
-                }
+              if (authProv.error != null) {
+                messager.showSnackBar(
+                  SnackBar(content: Text(applocal.t(authProv.error!))),
+                );
               }
             },
             icon: Icon(Icons.sync),

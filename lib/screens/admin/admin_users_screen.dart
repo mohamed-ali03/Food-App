@@ -14,6 +14,8 @@ class AdminUsersScreen extends StatelessWidget {
 
   Future<void> _changeRole(BuildContext context, UserModel user) async {
     final auth = context.read<AuthProvider>();
+    final messager = ScaffoldMessenger.of(context);
+    final appLocal = AppLocalizations.of(context);
     final currentRole = user.role;
     final roles = ['user', 'staff', 'admin'];
 
@@ -48,25 +50,18 @@ class AdminUsersScreen extends StatelessWidget {
 
     try {
       await auth.changeUserRole(user.authID, selected);
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      messager.showSnackBar(
         SnackBar(
           content: Text(
-            AppLocalizations.of(context).t(
-              'roleUpdatedTo',
-              data: {'role': AppLocalizations.of(context).t(selected)},
-            ),
+            appLocal.t('roleUpdatedTo', data: {'role': appLocal.t(selected)}),
           ),
         ),
       );
     } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      messager.showSnackBar(
         SnackBar(
           content: Text(
-            AppLocalizations.of(
-              context,
-            ).t('failedToUpdateRole', data: {'error': e.toString()}),
+            appLocal.t('failedToUpdateRole', data: {'error': e.toString()}),
           ),
         ),
       );

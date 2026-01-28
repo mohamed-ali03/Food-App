@@ -26,6 +26,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final messager = ScaffoldMessenger.of(context);
+    final appLocal = AppLocalizations.of(context);
     return Scaffold(
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
@@ -117,11 +119,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                     passwordController.text.trim(),
                                   );
 
-                                  if (authProvider.error != null &&
-                                      context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
+                                  if (authProvider.error != null) {
+                                    messager.showSnackBar(
                                       SnackBar(
-                                        content: Text(authProvider.error!),
+                                        content: Text(
+                                          appLocal.t(
+                                            "error",
+                                            data: {
+                                              "error": authProvider.error!,
+                                            },
+                                          ),
+                                        ),
                                       ),
                                     );
                                   }

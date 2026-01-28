@@ -54,16 +54,19 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Consumer<AuthProvider>(
-          builder: (context, provider, child) {
-            final user = provider.user;
-            if (user == null) {
-              return _EmptyState();
-            }
+      body: Consumer<AuthProvider>(
+        builder: (context, authProvider, child) {
+          if (authProvider.isLoading) {
+            return Center(child: CircularProgressIndicator());
+          }
 
-            return Column(
+          final user = authProvider.user;
+          if (user == null) {
+            return Center(child: _EmptyState());
+          }
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
               children: [
                 // Profile Header Section
                 AccountProfileHeader(
@@ -174,9 +177,9 @@ class _AccountScreenState extends State<AccountScreen> {
 
                 SizedBox(height: SizeConfig.blockHight * 4),
               ],
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -257,47 +260,42 @@ class _RoleBadge extends StatelessWidget {
 class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(SizeConfig.blockWidth * 5),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.person_off,
-              size: SizeConfig.blockWidth * 20,
-              color: Colors.grey[400],
-            ),
-            SizedBox(height: SizeConfig.blockHight * 3),
-            Text(
-              AppLocalizations.of(context).t('noUserData'),
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: Colors.grey[700],
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: SizeConfig.blockHight),
-            Text(
-              AppLocalizations.of(context).t('unableToLoadUserInfo'),
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: SizeConfig.blockHight * 2),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AuthScreen()),
-                );
-              },
-              child: Text(AppLocalizations.of(context).t('goToLogin')),
-            ),
-          ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.person_off,
+          size: SizeConfig.blockWidth * 20,
+          color: Colors.grey[400],
         ),
-      ),
+        SizedBox(height: SizeConfig.blockHight * 3),
+        Text(
+          AppLocalizations.of(context).t('noUserData'),
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            color: Colors.grey[700],
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: SizeConfig.blockHight),
+        Text(
+          AppLocalizations.of(context).t('unableToLoadUserInfo'),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+          textAlign: TextAlign.center,
+        ),
+        SizedBox(height: SizeConfig.blockHight * 2),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AuthScreen()),
+            );
+          },
+          child: Text(AppLocalizations.of(context).t('goToLogin')),
+        ),
+      ],
     );
   }
 }

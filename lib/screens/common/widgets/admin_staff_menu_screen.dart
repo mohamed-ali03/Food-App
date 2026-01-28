@@ -145,6 +145,8 @@ class _AdminStaffMenuScreenState extends State<AdminStaffMenuScreen> {
   void _showAddCategoryDialog(BuildContext context, {int? categoryId}) async {
     MenuProvider menuProvider = context.read<MenuProvider>();
     TextEditingController cat = TextEditingController();
+    final messager = ScaffoldMessenger.of(context);
+    final appLocal = AppLocalizations.of(context);
 
     late CategoryModel category;
 
@@ -195,15 +197,18 @@ class _AdminStaffMenuScreenState extends State<AdminStaffMenuScreen> {
       await menuProvider.updateCat(category);
     }
 
-    if (!context.mounted) return;
     if (menuProvider.error != null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(menuProvider.error!)));
+      messager.showSnackBar(
+        SnackBar(
+          content: Text(
+            appLocal.t('error', data: {'error': menuProvider.error!}),
+          ),
+        ),
+      );
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Category add successfully')));
+      messager.showSnackBar(
+        SnackBar(content: Text(appLocal.t('categoryAddSuccessfully'))),
+      );
     }
   }
 

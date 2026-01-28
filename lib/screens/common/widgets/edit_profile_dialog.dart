@@ -48,6 +48,8 @@ class EditProfileDialogState extends State<EditProfileDialog> {
   }
 
   Future<void> _handleImageUpload() async {
+    final messager = ScaffoldMessenger.of(context);
+    final applocal = AppLocalizations.of(context);
     setState(() => _isUploadingImage = true);
 
     final file = await _uploadImage.pickImage();
@@ -58,38 +60,31 @@ class EditProfileDialogState extends State<EditProfileDialog> {
 
     _imageUrl = await _uploadImage.uploadImage('user_pic', file);
 
-    if (mounted) {
-      if (_imageUrl!.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context).t('failedToUploadImage'),
-            ),
-          ),
-        );
-      }
-      setState(() => _isUploadingImage = false);
+    if (_imageUrl!.isEmpty) {
+      messager.showSnackBar(
+        SnackBar(content: Text(applocal.t('failedToUploadImage'))),
+      );
     }
+    setState(() => _isUploadingImage = false);
   }
 
   void _save() async {
+    final messager = ScaffoldMessenger.of(context);
+    final applocal = AppLocalizations.of(context);
+    final nav = Navigator.pop(context);
     if (widget.field == 'image') {
       if (_imageUrl != null && _imageUrl!.isNotEmpty) {
         await context.read<AuthProvider>().updateProfile(
           widget.user?.authID ?? '',
           imageUrl: _imageUrl,
         );
-        if (mounted) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context).t('profilePictureUpdated'),
-              ),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
+        nav;
+        messager.showSnackBar(
+          SnackBar(
+            content: Text(applocal.t('profilePictureUpdated')),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
       return;
     }
@@ -113,17 +108,10 @@ class EditProfileDialogState extends State<EditProfileDialog> {
       );
     }
 
-    if (mounted) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context).t('profileUpdatedSuccessfully'),
-          ),
-          backgroundColor: Colors.green,
-        ),
-      );
-    }
+    nav;
+    messager.showSnackBar(
+      SnackBar(content: Text(applocal.t('profileUpdatedSuccessfully'))),
+    );
   }
 
   @override

@@ -25,9 +25,10 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.read<AuthProvider>().users.firstWhere(
-      (u) => u.id == widget.user.id,
-    );
+    final auth = context.read<AuthProvider>();
+    final user = auth.users.firstWhere((u) => u.id == widget.user.id);
+    final messager = ScaffoldMessenger.of(context);
+    final appLocal = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context).t('customerDetails')),
@@ -141,23 +142,17 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                 trailing: Switch(
                   value: user.blocked,
                   onChanged: (value) async {
-                    await context.read<AuthProvider>().updateProfile(
-                      user.authID,
-                      blocked: value,
-                    );
-                    if (!context.mounted) return;
+                    await auth.updateProfile(user.authID, blocked: value);
 
-                    if (context.read<AuthProvider>().error == null) {
+                    if (auth.error == null) {
                       setState(() {});
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
+                      messager.showSnackBar(
                         SnackBar(
                           content: Text(
-                            AppLocalizations.of(context).t(
+                            appLocal.t(
                               "errorUpdatingProfile",
-                              data: {
-                                "error": context.read<AuthProvider>().error!,
-                              },
+                              data: {"error": auth.error!},
                             ),
                           ),
                         ),

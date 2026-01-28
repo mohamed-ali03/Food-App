@@ -14,6 +14,8 @@ class LogoutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final orderProvider = context.read<OrderProvider>();
     final authProvider = context.read<AuthProvider>();
+    final nav = Navigator.of(context);
+    final masseger = ScaffoldMessenger.of(context);
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
@@ -43,19 +45,16 @@ class LogoutButton extends StatelessWidget {
                   ),
                 );
 
-                if (confirm == true && context.mounted) {
+                if (confirm == true) {
                   await authProvider.logout();
                   if (authProvider.error == null) {
                     await orderProvider.clearAllData();
-                    if (!context.mounted) return;
                     // Clear navigation stack to let main app's consumer handle routing
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    nav.popUntil((route) => route.isFirst);
                   } else {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(authProvider.error!)),
-                      );
-                    }
+                    masseger.showSnackBar(
+                      SnackBar(content: Text(authProvider.error!)),
+                    );
                   }
                 }
               },

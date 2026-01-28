@@ -78,25 +78,23 @@ class _MenuItemFormDialogState extends State<MenuItemFormDialog> {
 
   void _handleImageUpload() async {
     isUploadingImage.value = true;
+    final messager = ScaffoldMessenger.of(context);
+    final appLocal = AppLocalizations.of(context);
 
     final file = await uploadImage.pickImage();
-    if (mounted && file == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context).t('failedToPickImage')),
-        ),
+    if (file == null) {
+      messager.showSnackBar(
+        SnackBar(content: Text(appLocal.t('failedToPickImage'))),
       );
       isUploadingImage.value = false;
       return;
     }
 
-    imageUrl.value = await uploadImage.uploadImage('item_pic', file!);
+    imageUrl.value = await uploadImage.uploadImage('item_pic', file);
 
-    if (mounted && imageUrl.value!.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context).t('failedToUploadImage')),
-        ),
+    if (imageUrl.value!.isEmpty) {
+      messager.showSnackBar(
+        SnackBar(content: Text(appLocal.t('failedToUploadImage'))),
       );
       isUploadingImage.value = false;
       return;

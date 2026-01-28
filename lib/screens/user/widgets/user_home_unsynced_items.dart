@@ -93,6 +93,8 @@ class _UnsyncedItemsState extends State<UnsyncedItems> {
   Future<void> _handleCheckout() async {
     final authProvider = context.read<AuthProvider>();
     final orderprovider = context.read<OrderProvider>();
+    final messager = ScaffoldMessenger.of(context);
+    final applocal = AppLocalizations.of(context);
 
     if (authProvider.user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -176,15 +178,11 @@ class _UnsyncedItemsState extends State<UnsyncedItems> {
 
     // If user cancelled or provided no address, stop
     if (address == null || address.isEmpty) {
-      if (mounted && (address == null)) {
+      if ((address == null)) {
         // cancelled - do nothing
-      } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context).t('pleaseProvideADeliveryAddress'),
-            ),
-          ),
+      } else {
+        messager.showSnackBar(
+          SnackBar(content: Text(applocal.t('pleaseProvideADeliveryAddress'))),
         );
       }
       return;

@@ -122,37 +122,35 @@ class _ItemCardState extends State<ItemCard> {
                                   ? () async {
                                       final menuProvider = context
                                           .read<MenuProvider>();
+                                      final messager = ScaffoldMessenger.of(
+                                        context,
+                                      );
+                                      final applocal = AppLocalizations.of(
+                                        context,
+                                      );
                                       widget.item.available =
                                           !widget.item.available;
                                       await menuProvider.updateItem(
                                         widget.item,
                                       );
-                                      if (context.mounted) {
-                                        if (menuProvider.error != null) {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                AppLocalizations.of(
-                                                  context,
-                                                ).t('failedToUpdateItem'),
+                                      if (menuProvider.error != null) {
+                                        messager.showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              applocal.t('failedToUpdateItem'),
+                                            ),
+                                          ),
+                                        );
+                                      } else {
+                                        messager.showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              applocal.t(
+                                                'itemUpdatedSuccessfully',
                                               ),
                                             ),
-                                          );
-                                        } else {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                AppLocalizations.of(
-                                                  context,
-                                                ).t('itemUpdatedSuccessfully'),
-                                              ),
-                                            ),
-                                          );
-                                        }
+                                          ),
+                                        );
                                       }
                                     }
                                   : null,

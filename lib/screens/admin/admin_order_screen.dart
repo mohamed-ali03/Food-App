@@ -65,21 +65,16 @@ class _AdminOrderScreenState extends State<AdminOrderScreen>
             onPressed: () async {
               final orderProv = context.read<OrderProvider>();
               final authProv = context.read<AuthProvider>();
+              final messager = ScaffoldMessenger.of(context);
               await orderProv.fetchAllOrders();
-              if (context.mounted) {
-                if (orderProv.error != null) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(orderProv.error!)));
-                }
+              if (orderProv.error != null) {
+                messager.showSnackBar(
+                  SnackBar(content: Text(orderProv.error!)),
+                );
               }
               await authProv.fetchAllUsers();
-              if (context.mounted) {
-                if (authProv.error != null) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(authProv.error!)));
-                }
+              if (authProv.error != null) {
+                messager.showSnackBar(SnackBar(content: Text(authProv.error!)));
               }
             },
             icon: Icon(Icons.sync),

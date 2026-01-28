@@ -185,6 +185,9 @@ class _AdminOrderHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final orderProvider = context.read<OrderProvider>();
+    final messager = ScaffoldMessenger.of(context);
+    final applocal = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -247,30 +250,23 @@ class _AdminOrderHeader extends StatelessWidget {
                     ),
                   );
                   if (confirmed != true) return;
-                  if (context.mounted) {
-                    await context.read<OrderProvider>().updateOrder(
-                      orderId,
-                      'canceled',
-                      msg: _messageController.text,
-                    );
-                  }
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          AppLocalizations.of(context).t(
-                            'orderStatusUpdatedTo',
-                            data: {
-                              'status': AppLocalizations.of(
-                                context,
-                              ).t('canceled'),
-                            },
-                          ),
+                  await orderProvider.updateOrder(
+                    orderId,
+                    'canceled',
+                    msg: _messageController.text,
+                  );
+
+                  messager.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        applocal.t(
+                          'orderStatusUpdatedTo',
+                          data: {'status': applocal.t('canceled')},
                         ),
-                        backgroundColor: Colors.red,
                       ),
-                    );
-                  }
+                      backgroundColor: Colors.red,
+                    ),
+                  );
                 },
                 icon: Icon(Icons.remove),
               ),
@@ -524,6 +520,9 @@ class _UserOrderFooter extends StatelessWidget {
 
   Future<void> _syncOrders(BuildContext context) async {
     final provider = context.read<OrderProvider>();
+    final messager = ScaffoldMessenger.of(context);
+    final applocal = AppLocalizations.of(context);
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(AppLocalizations.of(context).t('syncingOrders')),
@@ -532,40 +531,28 @@ class _UserOrderFooter extends StatelessWidget {
     );
     try {
       await provider.syncOrder(id);
-      if (context.mounted) {
-        final error = provider.error;
-        if (error != null && error.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              duration: Duration(seconds: 5),
-              content: Text(
-                AppLocalizations.of(
-                  context,
-                ).t('syncedFailed', data: {'error': error}),
-              ),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context).t('syncCompleted')),
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+      final error = provider.error;
+      if (error != null && error.isNotEmpty) {
+        messager.showSnackBar(
           SnackBar(
             duration: Duration(seconds: 5),
-            content: Text(
-              AppLocalizations.of(
-                context,
-              ).t('syncedFailed', data: {'error': e.toString()}),
-            ),
+            content: Text(applocal.t('syncedFailed', data: {'error': error})),
           ),
         );
+      } else {
+        messager.showSnackBar(
+          SnackBar(content: Text(applocal.t('syncCompleted'))),
+        );
       }
+    } catch (e) {
+      messager.showSnackBar(
+        SnackBar(
+          duration: Duration(seconds: 5),
+          content: Text(
+            applocal.t('syncedFailed', data: {'error': e.toString()}),
+          ),
+        ),
+      );
     }
   }
 
@@ -659,6 +646,11 @@ class _AdminOrderFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final orderProvider = context.read<OrderProvider>();
+    final authProvider = context.read<AuthProvider>();
+    final messager = ScaffoldMessenger.of(context);
+    final applocal = AppLocalizations.of(context);
+
     final canUpdate =
         order.status.toLowerCase() != 'delivered' &&
         order.status.toLowerCase() != 'canceled';
@@ -695,36 +687,26 @@ class _AdminOrderFooter extends StatelessWidget {
         if (canUpdate)
           ElevatedButton.icon(
             onPressed: () async {
-              if (context.mounted) {
-                await context.read<OrderProvider>().updateOrder(
-                  order.orderId!,
-                  nextStatus,
-                );
-              }
-              if (!context.mounted) return;
+              await orderProvider.updateOrder(order.orderId!, nextStatus);
+
               if (nextStatus.toLowerCase() == 'delivered') {
-                await context.read<AuthProvider>().updateProfile(
+                await authProvider.updateProfile(
                   order.userId,
                   buyingPoints: true,
                 );
               }
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      AppLocalizations.of(context).t(
-                        'orderStatusUpdatedTo',
-                        data: {
-                          'status': AppLocalizations.of(
-                            context,
-                          ).t(nextStatus.toLowerCase()),
-                        },
-                      ),
+
+              messager.showSnackBar(
+                SnackBar(
+                  content: Text(
+                    applocal.t(
+                      'orderStatusUpdatedTo',
+                      data: {'status': applocal.t(nextStatus.toLowerCase())},
                     ),
-                    backgroundColor: Colors.green,
                   ),
-                );
-              }
+                  backgroundColor: Colors.green,
+                ),
+              );
             },
             icon: Icon(Icons.arrow_forward, size: SizeConfig.blockHight * 2.25),
             label: Text(
@@ -787,22 +769,20 @@ class _AdminOrderFooter extends StatelessWidget {
                   ],
                 ),
               );
-              if (context.mounted) {
-                if (confirmed == 'retrieve') {
-                  await context.read<OrderProvider>().updateOrder(
-                    order.orderId!,
-                    'pending',
-                    msg: '',
-                  );
-                } else if (confirmed == 'confirm') {
-                  await context.read<OrderProvider>().updateOrder(
-                    order.orderId!,
-                    'canceled',
-                    msg: _messageController.text,
-                  );
-                } else {
-                  return;
-                }
+              if (confirmed == 'retrieve') {
+                await orderProvider.updateOrder(
+                  order.orderId!,
+                  'pending',
+                  msg: '',
+                );
+              } else if (confirmed == 'confirm') {
+                await orderProvider.updateOrder(
+                  order.orderId!,
+                  'canceled',
+                  msg: _messageController.text,
+                );
+              } else {
+                return;
               }
             },
             icon: Icon(Icons.message),
