@@ -36,7 +36,9 @@ class OrderProvider extends ChangeNotifier {
     try {
       _setError(null);
       // sync orders
-      // await _repo.fetchAllOrders();
+      if (role == 'user') {
+        await _repo.fetchAllOrders();
+      }
 
       // Start realtime AFTER init
       _repo.listenToOrderChanges(role ?? 'user');
@@ -94,7 +96,6 @@ class OrderProvider extends ChangeNotifier {
       await _repo.updateOrdersItem(orderItems);
     } catch (e) {
       _setError('Failed to update orderItem locally: $e');
-
       debugPrint('Error updating orderItem locally: $e');
       _setLoading(false);
     }
@@ -211,7 +212,6 @@ class OrderProvider extends ChangeNotifier {
     try {
       if (!_isDisposed) {
         error = value;
-        notifyListeners();
       }
     } catch (e) {
       rethrow;

@@ -166,7 +166,6 @@ class MenuProvider extends ChangeNotifier {
   void _setError(String? value) {
     if (!_isDisposed) {
       error = value;
-      notifyListeners();
     }
   }
 

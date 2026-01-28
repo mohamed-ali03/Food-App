@@ -35,10 +35,6 @@ class _UnsyncedItemsState extends State<UnsyncedItems> {
 
   @override
   void dispose() {
-    // Only update if there are items left and changes were made
-    if (isChanged) {
-      orderProvider.updateOrderItemsLocally(widget.orderItems);
-    }
     totalPrice.dispose();
     addressController.dispose();
     super.dispose();
@@ -201,29 +197,37 @@ class _UnsyncedItemsState extends State<UnsyncedItems> {
   Widget build(BuildContext context) {
     _calculateTotal();
 
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.separated(
-            padding: EdgeInsets.symmetric(vertical: SizeConfig.blockHight),
-            itemCount: widget.orderItems.length,
-            separatorBuilder: (_, _) => SizedBox(height: SizeConfig.blockHight),
-            itemBuilder: (context, index) {
-              final orderItem = widget.orderItems[index];
-              return OrderItemCard(
-                orderItem: orderItem,
-                onChangeQty: (qty) {
-                  orderItem.quantity = qty;
-                  isChanged = true;
-                  _calculateTotal();
-                },
-                onDeleteOrderItem: () => _onDeleteItem(index),
-              );
-            },
+    return PopScope(
+      onPopInvoked: (didPop) async {
+        if (didPop && isChanged) {
+          await orderProvider.updateOrderItemsLocally(widget.orderItems);
+        }
+      },
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView.separated(
+              padding: EdgeInsets.symmetric(vertical: SizeConfig.blockHight),
+              itemCount: widget.orderItems.length,
+              separatorBuilder: (_, _) =>
+                  SizedBox(height: SizeConfig.blockHight),
+              itemBuilder: (context, index) {
+                final orderItem = widget.orderItems[index];
+                return OrderItemCard(
+                  orderItem: orderItem,
+                  onChangeQty: (qty) {
+                    orderItem.quantity = qty;
+                    isChanged = true;
+                    _calculateTotal();
+                  },
+                  onDeleteOrderItem: () => _onDeleteItem(index),
+                );
+              },
+            ),
           ),
-        ),
-        _buildCheckoutSection(),
-      ],
+          _buildCheckoutSection(),
+        ],
+      ),
     );
   }
 

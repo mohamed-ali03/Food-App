@@ -34,10 +34,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       _setError(null);
       _setLoading(true);
-      final isUser = await _repo.login(email, password);
-      if (!isUser) {
-        await fetchAllUsers();
-      }
+      await _repo.login(email, password);
     } catch (e) {
       _setError('Login failed: $e');
       debugPrint('Login error: $e');
@@ -165,7 +162,6 @@ class AuthProvider extends ChangeNotifier {
   void _setError(String? value) {
     if (!_isDisposed) {
       error = value;
-      notifyListeners();
     }
   }
 

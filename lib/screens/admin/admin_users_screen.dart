@@ -75,6 +75,20 @@ class AdminUsersScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context).t('manageUsers')),
         elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final authProv = context.read<AuthProvider>();
+              final messager = ScaffoldMessenger.of(context);
+
+              await authProv.fetchAllUsers();
+              if (authProv.error != null) {
+                messager.showSnackBar(SnackBar(content: Text(authProv.error!)));
+              }
+            },
+            icon: Icon(Icons.sync),
+          ),
+        ],
       ),
       body: Consumer<AuthProvider>(
         builder: (context, auth, _) {

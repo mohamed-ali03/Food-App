@@ -39,12 +39,12 @@ void main() async {
         ChangeNotifierProvider(create: (context) => MenuProvider()),
         ChangeNotifierProvider(create: (context) => AppSettingsProvider()),
         ChangeNotifierProxyProvider<AuthProvider, OrderProvider>(
-          create: (context) => OrderProvider('user'),
+          create: (context) => OrderProvider(null),
           update: (context, authProvider, orderProvider) {
             if (orderProvider?.orders.isNotEmpty ?? false) {
               return orderProvider!;
             }
-            return OrderProvider(authProvider.user?.role ?? 'user');
+            return OrderProvider(authProvider.user?.role);
           },
         ),
       ],
